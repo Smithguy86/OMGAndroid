@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">OMG Android</string>
+
+    <string name="textview"> Android Study Group-Dan</string>
+    <string name="action_settings">Settings</string>
+    <string name="button">Update the TextView</string>
+    <string name="hint">A name</string>
+</resources>
