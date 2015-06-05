@@ -1,3 +1,3 @@
 # OMGAndroid
-Project that shows how ListViews are created.
-Log is used to record the code's activity. 
+Project that shows how to use mShareActionProvider and mSharedPreferences to share text to other applications
+ and store information in memory, respectively.
