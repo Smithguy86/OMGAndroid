@@ -48,6 +48,7 @@ public class JSONAdapter extends BaseAdapter {
      */
     @Override
     public Object getItem(int position) {
+
         return mJsonArray.optJSONObject(position);
     }
 
