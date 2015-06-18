@@ -2,6 +2,7 @@ package com.example.dcarrion.omgandroid;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -11,7 +12,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -35,13 +35,15 @@ public class MainActivity extends Activity implements View.OnClickListener,Adapt
     Button mainButton;
     EditText mainEditText;
     ListView mainListView;
-    ArrayAdapter mArrayAdapter;
+    //ArrayAdapter mArrayAdapter;
     JSONAdapter mJSONAdapter;
     ArrayList mNameList = new ArrayList();
     ShareActionProvider mShareActionProvider;
     private static final String PREFS = "prefs";
     private static final String PREF_NAME = "name";
     private static final String QUERY_URL = "http://openlibrary.org/search.json?q=";
+    ProgressDialog mDialog;
+
 
     SharedPreferences mSharedPreferences;
 
@@ -66,10 +68,10 @@ public class MainActivity extends Activity implements View.OnClickListener,Adapt
         mainListView = (ListView) findViewById(R.id.main_listview);
 
         // Create an ArrayAdapter for the ListView
-        mArrayAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1,mNameList);
+        //mArrayAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1,mNameList);
 
         //Set the listview to use the arrayAdapter
-        mainListView.setAdapter(mArrayAdapter);
+        //mainListView.setAdapter(mArrayAdapter);
 
         // Set this activity to react to the items being pressed
         mainListView.setOnItemClickListener(this);
@@ -77,10 +79,14 @@ public class MainActivity extends Activity implements View.OnClickListener,Adapt
         displayWelcome();
 
         // 10. Create a JSONAdapter for the ListView
-        //mJSONAdapter = new JSONAdapter(this, getLayoutInflater());
+        mJSONAdapter = new JSONAdapter(this, getLayoutInflater());
 
         // Set the ListView to use the ArrayAdapter
-        //mainListView.setAdapter(mJSONAdapter);
+        mainListView.setAdapter(mJSONAdapter);
+
+        mDialog = new ProgressDialog(this);
+        mDialog.setMessage("Searching for Book");
+        mDialog.setCancelable(false);
     }
 
     @Override
@@ -131,16 +137,16 @@ public class MainActivity extends Activity implements View.OnClickListener,Adapt
         //mainTextView.setText("Button Pressed");
 
         //Take what was typed in the Edit Text and use it in the TextView
-        mainTextView.setText(mainEditText.getText().toString() + " is learning Android Dev");
+        //mainTextView.setText(mainEditText.getText().toString() + " is learning Android Dev");
 
         //Also add that value to the list shown in the listView
-        mNameList.add(mainEditText.getText().toString());
-        mArrayAdapter.notifyDataSetChanged();
+        //mNameList.add(mainEditText.getText().toString());
+        //mArrayAdapter.notifyDataSetChanged();
 
         // The text you want to share has changed and you need to update.
-        setShareIntent();
+        //setShareIntent();
         // 9. Take what was typed into the EditText and use in search
-        //queryBooks(mainEditText.getText().toString());
+        queryBooks(mainEditText.getText().toString());
 
     }
 
@@ -161,7 +167,20 @@ public class MainActivity extends Activity implements View.OnClickListener,Adapt
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
 //        //Log the item position and contents to the console in Debug
-        Log.d("omg Android", position + ":" + mNameList.get(position));
+        //Log.d("omg Android", position + ":" + mNameList.get(position));
+        //When User selects the book, grab the data to be displayed on the detailed activity
+        JSONObject jsonObject = (JSONObject) mJSONAdapter.getItem(position);
+        String coverID = jsonObject.optString("cover_i","");
+
+        //Create an intent to take you to the next activity
+        Intent detailIntent = new Intent(this, DetailActivity.class);
+
+        //Put the data about the cover in intent before you make the call
+        detailIntent.putExtra("coverID", coverID);
+
+        //Start the activity using the previous intent
+        startActivity(detailIntent);
+
 
     }
 
@@ -232,6 +251,8 @@ public class MainActivity extends Activity implements View.OnClickListener,Adapt
 
         // Create a client to perform networking
         AsyncHttpClient client = new AsyncHttpClient();
+        //Show Progress Dialog to show background work
+        mDialog.show();
 
         // Have the client get a JSONArray of data
         // and define how to respond
@@ -240,13 +261,15 @@ public class MainActivity extends Activity implements View.OnClickListener,Adapt
 
                     @Override
                     public void onSuccess(JSONObject jsonObject) {
+                        //Dismiss the progress Dialog
+                        mDialog.dismiss();
 
                         // Display a "Toast" message
                         // to announce your success
                         Toast.makeText(getApplicationContext(), "Success!", Toast.LENGTH_LONG).show();
 
                         // 8. For now, just log results
-                        //Log.d("omg android", jsonObject.toString());
+                        Log.d("omg android", jsonObject.toString());
 
                         // update the data in your custom method.
                         mJSONAdapter.updateData(jsonObject.optJSONArray("docs"));
@@ -254,6 +277,8 @@ public class MainActivity extends Activity implements View.OnClickListener,Adapt
 
                     @Override
                     public void onFailure(int statusCode, Throwable throwable, JSONObject error) {
+                        //Dismiss progress dialog
+                        mDialog.dismiss();
 
                         // Display a "Toast" message
                         // to announce the failure
