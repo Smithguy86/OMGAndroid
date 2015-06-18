@@ -1,15 +1,19 @@
 package com.example.dcarrion.omgandroid;
 
+import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.widget.ImageView;
+
+import com.squareup.picasso.Picasso;
 
 /**
  * Created by dcarrion on 6/18/2015.
  */
 public class DetailActivity extends ActionBarActivity {
 
-    /*private static final String IMAGE_URL_BASE="http://covers.openlibrary.org/b/id/";
+    private static final String IMAGE_URL_BASE="http://covers.openlibrary.org/b/id/";
     String mImageURL;
-    ShareActionProvider mShareActionProvider;
+    //ShareActionProvider mShareActionProvider;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,9 +40,9 @@ public class DetailActivity extends ActionBarActivity {
             //Use Picaso(third party library..to load the image
             Picasso.with(this).load(mImageURL).placeholder(R.mipmap.img_books_loading).into(imageView);
         }
-    }*/
+    }
 
-/*    private void setShareIntent() {
+  /*  private void setShareIntent() {
 
         // create an Intent with the contents of the TextView
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
